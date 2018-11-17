@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createProject } from '../../store/actions/projectActions'
-import { dispatch } from 'rxjs/internal/observable/pairs';
+import { dispatch } from 'rxjs/internal/observable/pairs'
+import { Redirect } from 'react-router-dom'
 
 class CreateProject extends Component {
   constructor (props) {
@@ -24,6 +25,8 @@ class CreateProject extends Component {
     this.props.createProject(this.state)
   }
   render () {
+    const { auth } = this.props
+    if (!auth.uid) return <Redirect to='/signin' />
     return (
       <div className='container'>
         <form onSubmit={this.handleSubmit} className='white'>
@@ -34,7 +37,7 @@ class CreateProject extends Component {
           </div>
           <div className='input-field'>
             <label htmlFor='content'>Project Content</label>
-            <textarea id='content' rows="10" className='materialize-textarea' onChange={this.handleChange} />
+            <textarea id='content' rows='10' className='materialize-textarea' onChange={this.handleChange} />
           </div>
           <div className='input-field'>
             <button className='btn lighten-1 pink z-depth-0'>Create</button>
@@ -44,11 +47,15 @@ class CreateProject extends Component {
     )
   }
 }
-
+const mapStateToProps = (state) => {
+  return {
+    auth: state.firebase.auth
+  }
+}
 const mapDispatchToProps = (dispatch) => {
   return {
     createProject: (project) => dispatch(createProject(project))
   }
 }
 
-export default connect(null, mapDispatchToProps)(CreateProject)
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProject)
